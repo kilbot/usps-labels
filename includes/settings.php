@@ -126,13 +126,33 @@ XML;
         // Parse the API response to get the PDF data
         $body = wp_remote_retrieve_body( $response );
         $xml = simplexml_load_string( $body );
-        $pdf_data = (string) $xml->LabelImage;
 
-        // Display the PDF in an iframe using a data URI
         echo '<hr>';
         echo '<h2>' . esc_html__( 'Example USPS Return Label', 'usps-labels' ) . '</h2>';
-        echo "<iframe src='data:application/pdf;base64," . $pdf_data . "' width='100%' height='300px'></iframe>";
+
+        // Display the PDF in an iframe using a data URI
+        if($pdf_data = (string) $xml->LabelImage) {
+            echo "<iframe src='data:application/pdf;base64," . $pdf_data . "' width='100%' height='300px'></iframe>";
+            return;
+        }
+
+        // Check for errors in the XML response
+        if ($xml->getName() === 'Error') {
+            $errorNumber = (string) $xml->Number;
+            $errorDescription = (string) $xml->Description;
+            // $errorSource = (string) $xml->Source;
+
+            $errorMessage = "
+                Error Number: $errorNumber <br>
+                Description: $errorDescription <br>
+            ";
+
+            echo '<p>' . esc_html__( 'Error generating label:', 'usps-labels' ) . '</p>';
+            echo '<p>' . $errorMessage . '</p>';
+            return;
+        }
+
+        // Unknown error
+        echo '<p>' . esc_html__( 'Unknown error', 'usps-labels'  ) . '</p>';
     }
-
-
 }
