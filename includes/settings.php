@@ -86,7 +86,7 @@ class Settings extends WC_Integration {
 <RetailerATTN>ATTN: Retailer Returns Department</RetailerATTN>
 <RetailerFirm>Retailer Firm</RetailerFirm>
 <WeightInOunces>80</WeightInOunces>
-<ServiceType>PRIORITY</ServiceType>
+<ServiceType>GROUND</ServiceType>
 <Width>4</Width>
 <Length>10</Length>
 <Height>7</Height>

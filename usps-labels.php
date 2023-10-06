@@ -2,7 +2,7 @@
 /**
  * Plugin Name: USPS Labels
  * Description: Generate USPS Labels
- * Version: 0.0.2
+ * Version: 0.0.3
  * Author: kilbot
  * License: GPL-2.0+
  * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
@@ -26,10 +26,12 @@ class Init {
     }
 
     public function __construct() {
-        add_action( 'plugins_loaded', array( $this, 'init' ) );
+        add_action( 'plugins_loaded', array( $this, 'load_settings' ) );
+        add_action( 'init', array( $this, 'add_custom_rewrite_rule' ) );
+        add_action( 'wp', array( $this, 'wp_init' ) );
     }
 
-    public function init() {
+    public function load_settings() {
         // Checks if WooCommerce is installed.
         if ( class_exists( 'WC_Integration' ) ) {
             include_once 'includes/settings.php';
@@ -43,6 +45,23 @@ class Init {
     public function add_integration( $integrations ) {
         $integrations[] = 'USPS_Labels\Settings';
         return $integrations;
+    }
+
+    /**
+     * Add rewrite rule for My Account > Shipping Label page
+     */
+    public function add_custom_rewrite_rule() {
+        add_rewrite_endpoint( 'print-shipping-label', EP_ROOT | EP_PAGES );
+    }
+
+    /**
+     * Initialize My Account page
+     */
+    public function wp_init() {
+        if ( function_exists('is_account_page') && is_account_page() ) {
+            include_once 'includes/my-account.php';
+            new MyAccount();
+        }
     }
 
 }
