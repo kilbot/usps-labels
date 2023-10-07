@@ -2,7 +2,7 @@
 /**
  * Plugin Name: USPS Labels
  * Description: Generate USPS Labels
- * Version: 0.0.3
+ * Version: 0.0.4
  * Author: kilbot
  * License: GPL-2.0+
  * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
@@ -52,6 +52,7 @@ class Init {
      */
     public function add_custom_rewrite_rule() {
         add_rewrite_endpoint( 'print-shipping-label', EP_ROOT | EP_PAGES );
+        add_rewrite_endpoint( 'track-shipping', EP_ROOT | EP_PAGES );
     }
 
     /**
