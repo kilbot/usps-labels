@@ -28,15 +28,15 @@ class MyAccount {
     function add_print_label_button( array $actions, WC_Order $order ) {
         $usps_tracking_values = get_post_meta( $order->get_ID(), 'usps_tracking', false );
 
-        if ( empty( $usps_tracking_values ) ) {
-            $actions['print-shipping-label'] = array(
-                'url'  => wc_get_endpoint_url( 'print-shipping-label', $order->get_id(), wc_get_page_permalink( 'myaccount' ) ),
-                'name' => __( 'Print Shipping Label', 'usps-labels' )
-            );
-        } else {
+        if ( ! empty( $usps_tracking_values ) ) {
             $actions['track-shipping'] = array(
                 'url'  => wc_get_endpoint_url( 'track-shipping', $order->get_id(), wc_get_page_permalink( 'myaccount' ) ),
                 'name' => __( 'Track Shipping', 'usps-labels' )
+            );
+        } elseif ( $order->get_status() === 'processing') {
+            $actions['print-shipping-label'] = array(
+                'url'  => wc_get_endpoint_url( 'print-shipping-label', $order->get_id(), wc_get_page_permalink( 'myaccount' ) ),
+                'name' => __( 'Print Shipping Label', 'usps-labels' )
             );
         }
 
@@ -94,11 +94,20 @@ class MyAccount {
         $usps_tracking_values = get_post_meta( $order_id, 'usps_tracking', false );
 
         if ( !empty( $usps_tracking_values ) ) {
-            echo "USPS Tracking Numbers:<br>";
 
             // Loop through and echo each tracking number
             foreach ( $usps_tracking_values as $tracking_number ) {
-                echo $tracking_number . "<br>";
+                echo '<div>';
+                echo '<h4 style="margin-top:0">Tracking Info for ' . $tracking_number . '</h4>';
+                echo '<p><strong>Summary:</strong> Your item is out for delivery.</p>';
+                echo '<p><strong>Expected Delivery:</strong> January 5, 2023, 3:00 pm</p>';
+                echo '<p>';
+                echo '<strong>Details:</strong>';
+                echo '<li>January 1, 2023, 2:59 pm - Delivered, In/At Mailbox - SOMEWHERE, DC 20500</li>';
+                echo '<li>January 1, 2023, 8:12 am - Out for Delivery - SOMEWHERE, DC 20500</li>';
+                echo '<li>January 1, 2023, 7:12 am - Sorting Complete - SOMEWHERE, DC 20500</li>';
+                echo '</ul>';
+                echo '</p>';
             }
         } else {
             echo "No USPS tracking numbers found.";
