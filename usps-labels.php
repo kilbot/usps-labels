@@ -2,7 +2,7 @@
 /**
  * Plugin Name: USPS Labels
  * Description: Generate USPS Labels
- * Version: 0.0.5
+ * Version: 0.0.6
  * Author: kilbot
  * License: GPL-2.0+
  * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
