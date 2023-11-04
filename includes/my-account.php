@@ -79,7 +79,8 @@ class MyAccount {
      *
      */
     function print_shipping_label( $order_id ) {
-        WC_Shortcode_My_Account::edit_address('shipping');
+        // add shipping form to the page
+        $this->print_shipping_address( $order_id );
 
         // Retrieve stored settings
         $settings = get_option('woocommerce_usps_labels_settings');
@@ -93,7 +94,14 @@ class MyAccount {
         $shipping_address = $order->get_address('shipping');
 
         // Fetch WordPress admin details
-        $admin_user = get_user_by('email', get_option('admin_email'));
+        $admin_email = get_option('admin_email');
+        if ( ! is_email( $admin_email ) ) {
+            echo '<p>' . esc_html__('Error getting admin email.', 'usps-labels') . '</p>';
+            return;
+        }
+
+        $admin_user = get_user_by('email', $admin_email);
+        $admin_name = $admin_user->display_name;
 
         // Define the XML request payload with the USPS API credentials
         $xml_request = <<<XML
@@ -118,8 +126,8 @@ class MyAccount {
 <Attention></Attention> 
 <SenderName>{$shipping_address['first_name']} {$shipping_address['last_name']}</SenderName>
 <SenderEmail>{$order->get_billing_email()}</SenderEmail>
-<RecipientName>{$admin_user->display_name}</RecipientName>
-<RecipientEmail>{$admin_user->user_email}</RecipientEmail>
+<RecipientName>{$admin_name}</RecipientName>
+<RecipientEmail>{$admin_email}</RecipientEmail>
 <RecipientBCC></RecipientBCC>
 </ExternalReturnLabelRequest>
 XML;
@@ -146,11 +154,71 @@ XML;
         // Get the PDF data as a text string
         if ( isset($xml->ReturnLabel) && $pdf_data = (string) $xml->ReturnLabel ) {
             
-            echo "<iframe src='data:application/pdf;base64," . $pdf_data . "' width='100%' height='600px'></iframe>";
+            echo "<iframe src='data:application/pdf;base64," . $pdf_data . "' width='100%' height='930px'></iframe>";
         } else {
             echo $body;
             echo '<p>' . esc_html__('Error: ReturnLabel is missing in the response', 'usps-labels') . '</p>';
         }
+    }
+
+    /**
+     * Print Shipping Form
+     */
+    function print_shipping_address( $order_id ) {
+        $order = wc_get_order($order_id);
+
+        if( ! $order ) {
+            echo '<p>' . esc_html__('Error: Order not found!', 'usps-labels') . '</p>';
+            return;
+        }
+
+        if ( isset( $_POST['save_address'] ) && isset( $_POST['woocommerce-edit-address-nonce'] ) ) {
+            // Verify the nonce.
+            if ( ! wp_verify_nonce( $_POST['woocommerce-edit-address-nonce'], 'woocommerce-edit_address' ) ) {
+                wc_add_notice( __( 'Your session has expired. Please try again.', 'woocommerce' ), 'error' );
+            }
+
+            // Get the submitted values from $_POST and sanitize them.
+            $shipping_first_name = sanitize_text_field( $_POST['shipping_first_name'] );
+            $shipping_last_name = sanitize_text_field( $_POST['shipping_last_name'] );
+            $shipping_company = sanitize_text_field( $_POST['shipping_company'] );
+            $shipping_address_1 = sanitize_text_field( $_POST['shipping_address_1'] );
+            $shipping_address_2 = sanitize_text_field( $_POST['shipping_address_2'] );
+            $shipping_city = sanitize_text_field( $_POST['shipping_city'] );
+            $shipping_state = sanitize_text_field( $_POST['shipping_state'] );
+            $shipping_postcode = sanitize_text_field( $_POST['shipping_postcode'] );
+            $shipping_country = sanitize_text_field( $_POST['shipping_country'] );
+
+            // Update the order's shipping address.
+            $order->set_shipping_first_name( $shipping_first_name );
+            $order->set_shipping_last_name( $shipping_last_name );
+            $order->set_shipping_company( $shipping_company );
+            $order->set_shipping_address_1( $shipping_address_1 );
+            $order->set_shipping_address_2( $shipping_address_2 );
+            $order->set_shipping_city( $shipping_city );
+            $order->set_shipping_state( $shipping_state );
+            $order->set_shipping_postcode( $shipping_postcode );
+            $order->set_shipping_country( $shipping_country );
+
+            // Save the order.
+            $order->save();
+
+        } else {
+            // Populate the form with the order's shipping details.
+            $_POST['shipping_first_name'] = $order->get_shipping_first_name();
+            $_POST['shipping_last_name'] = $order->get_shipping_last_name();
+            $_POST['shipping_company'] = $order->get_shipping_company();
+            $_POST['shipping_address_1'] = $order->get_shipping_address_1();
+            $_POST['shipping_address_2'] = $order->get_shipping_address_2();
+            $_POST['shipping_city'] = $order->get_shipping_city();
+            $_POST['shipping_state'] = $order->get_shipping_state();
+            $_POST['shipping_postcode'] = $order->get_shipping_postcode();
+            $_POST['shipping_country'] = $order->get_shipping_country();
+
+            echo $_POST['shipping_state'];
+        }
+        
+        WC_Shortcode_My_Account::edit_address('shipping');
     }
 
     /**
