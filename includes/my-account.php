@@ -118,18 +118,18 @@ class MyAccount {
 <MID>$mid</MID> 
 <LabelDefinition>4X6</LabelDefinition> 
 <ServiceTypeCode>020</ServiceTypeCode> 
-<MerchandiseDescription>$merchandise_description</MerchandiseDescription> 
+<MerchandiseDescription>{$merchandise_description}</MerchandiseDescription> 
 <InsuranceAmount></InsuranceAmount> 
 <AddressOverrideNotification>true</AddressOverrideNotification> 
-<PackageInformation></PackageInformation> 
+<PackageInformation>{$order_id}</PackageInformation> 
 <PackageInformation2></PackageInformation2> 
 <CallCenterOrSelfService>Customer</CallCenterOrSelfService> 
 <CompanyName></CompanyName> 
 <Attention></Attention> 
-<SenderName>{$shipping_address['first_name']} {$shipping_address['last_name']}</SenderName>
-<SenderEmail>{$order->get_billing_email()}</SenderEmail>
-<RecipientName>{$admin_name}</RecipientName>
-<RecipientEmail>{$admin_email}</RecipientEmail>
+<SenderName></SenderName>
+<SenderEmail></SenderEmail>
+<RecipientName></RecipientName>
+<RecipientEmail></RecipientEmail>
 <RecipientBCC></RecipientBCC>
 </ExternalReturnLabelRequest>
 XML;
