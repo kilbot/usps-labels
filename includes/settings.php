@@ -49,6 +49,13 @@ class Settings extends WC_Integration {
                 'desc_tip'    => true,
                 'default'     => '',
             ),
+            'merchandise_description' => array(
+                'title'       => __( 'Merchandise Description', 'usps-labels' ),
+                'type'        => 'textarea',
+                'description' => __( 'Describe the merchandise being shipped.', 'usps-labels' ),
+                'desc_tip'    => true,
+                'default'     => '',
+            ),
         );
     }
 
@@ -58,6 +65,7 @@ class Settings extends WC_Integration {
         // Get the USPS API credentials from the settings
         $merchant_account_number = $this->get_option( 'merchant_account_number' );
         $mid = $this->get_option( 'mid' );
+        $merchandise_description = $this->get_option( 'merchandise_description' );
 
         if ( ! $merchant_account_number || ! $mid ) {
             return;
@@ -76,7 +84,7 @@ class Settings extends WC_Integration {
 <MID>$mid</MID> 
 <LabelDefinition>4X6</LabelDefinition> 
 <ServiceTypeCode>020</ServiceTypeCode> 
-<MerchandiseDescription></MerchandiseDescription> 
+<MerchandiseDescription>$merchandise_description</MerchandiseDescription> 
 <InsuranceAmount></InsuranceAmount> 
 <AddressOverrideNotification>true</AddressOverrideNotification> 
 <PackageInformation></PackageInformation> 
@@ -117,7 +125,7 @@ XML;
 
         // Display the PDF in an iframe using a data URI
         if ( isset($xml->ReturnLabel) && $pdf_data = (string) $xml->ReturnLabel ) {
-            echo "<iframe src='data:application/pdf;base64," . $pdf_data . "' width='100%' height='300px'></iframe>";
+            echo "<iframe src='data:application/pdf;base64," . $pdf_data . "' width='100%' height='600px'></iframe>";
             return;
         }
 

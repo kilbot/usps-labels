@@ -88,6 +88,8 @@ class MyAccount {
         // Get the merchant_account_number and mid from the settings array
         $merchant_account_number = $settings['merchant_account_number'] ?? null;
         $mid = $settings['mid'] ?? null;
+        $merchandise_description = $settings['merchandise_description'] ?? null;
+
 
         // Fetch order details
         $order = wc_get_order($order_id);
@@ -116,7 +118,7 @@ class MyAccount {
 <MID>$mid</MID> 
 <LabelDefinition>4X6</LabelDefinition> 
 <ServiceTypeCode>020</ServiceTypeCode> 
-<MerchandiseDescription></MerchandiseDescription> 
+<MerchandiseDescription>$merchandise_description</MerchandiseDescription> 
 <InsuranceAmount></InsuranceAmount> 
 <AddressOverrideNotification>true</AddressOverrideNotification> 
 <PackageInformation></PackageInformation> 
@@ -214,8 +216,6 @@ XML;
             $_POST['shipping_state'] = $order->get_shipping_state();
             $_POST['shipping_postcode'] = $order->get_shipping_postcode();
             $_POST['shipping_country'] = $order->get_shipping_country();
-
-            echo $_POST['shipping_state'];
         }
         
         WC_Shortcode_My_Account::edit_address('shipping');
