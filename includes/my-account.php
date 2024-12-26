@@ -8,10 +8,6 @@ use WC_Shortcode_My_Account;
 class MyAccount {
 
     public function __construct() {
-        if ( !current_user_can('manage_options') ) {
-            return;
-        }
-
         add_filter( 'woocommerce_my_account_my_orders_actions', array( $this, 'add_print_label_button' ), 10, 2 );
         add_filter( 'woocommerce_account_menu_item_classes', array( $this, 'shipping_label_menu_item' ), 10, 2 );
         add_action( 'woocommerce_account_print-shipping-label_endpoint', array( $this, 'print_shipping_label' ) );
